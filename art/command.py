@@ -1,10 +1,8 @@
 import argparse
 import atexit
-
 import logging
 import os
 import shutil
-import sys
 import tempfile
 
 from art.config import ArtConfig, FileMapEntry
@@ -30,8 +28,6 @@ def get_argument_parser():
 
 
 def run_command(argv=None):
-    if argv is None:
-        argv = sys.argv[1:]
     ap = get_argument_parser()
     args = ap.parse_args(argv)
     logging.basicConfig(level=(args.log_level or logging.INFO))

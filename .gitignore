@@ -3,10 +3,12 @@
 *.py[cod]
 *cache
 *log
-.coverage*
+.coverage
+.coverage.*
 .idea
 /*_test.py
 build/
 dist/
+htmlcov
 lib/
 lib64/
