@@ -1,0 +1,8 @@
+prepare:
+  - python3 setup.py -q bdist_wheel
+file_map:
+  - source: dist/*.whl
+    strip: 1
+    rename:
+    - from: art-.*\.whl
+      to: art.whl

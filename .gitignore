@@ -1,0 +1,12 @@
+*.egg
+*.egg-info/
+*.py[cod]
+*cache
+*log
+.coverage*
+.idea
+/*_test.py
+build/
+dist/
+lib/
+lib64/
