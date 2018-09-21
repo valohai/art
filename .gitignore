@@ -8,6 +8,7 @@
 .idea
 /*_test.py
 build/
+coverage.xml
 dist/
 htmlcov
 lib/

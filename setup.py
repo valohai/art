@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-import re
 
 from setuptools import setup
 
 from art import __version__
 
+tests_require = ['pytest', 'pytest-cov']
 setup(
     name='art',
     short_description='Artifact manager',
@@ -15,5 +15,6 @@ setup(
     packages=['art'],
     entry_points={'console_scripts': ['art=art.command:run_command']},
     install_requires=['boto3', 'pyyaml'],
-    tests_require=['pytest', 'pytest-cov'],
+    tests_require=tests_require,
+    extras_require={'test': tests_require},
 )

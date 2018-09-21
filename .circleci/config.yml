@@ -1,0 +1,14 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run:
+          name: test
+          command: |
+            PATH=~/.local/bin:$PATH
+            pip install --user -e .[test] codecov
+            py.test --cov art -vv .
+            codecov
