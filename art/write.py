@@ -1,5 +1,4 @@
 import io
-import json
 import logging
 import os
 import posixpath
@@ -26,9 +25,9 @@ def write(config, *, dest, path_suffix, manifest):
     dest = posixpath.join(dest, path_suffix)
     for dest_filename, fileinfo in manifest["files"].items():
         dest_path = posixpath.join(dest, dest_filename)
-        with open(os.path.join(config.work_dir, fileinfo["path"]), "rb") as infp:
+        local_path = os.path.join(config.work_dir, fileinfo["path"])
+        with open(local_path, "rb") as infp:
             _write_file(dest_path, infp)
-    manifest_data = json.dumps(
-        manifest, sort_keys=True, ensure_ascii=False, indent=2
-    ).encode()
-    _write_file(posixpath.join(dest, ".manifest.json"), io.BytesIO(manifest_data))
+
+    _write_file(posixpath.join(dest, ".manifest.json"), io.BytesIO(manifest.as_json_bytes()))
+

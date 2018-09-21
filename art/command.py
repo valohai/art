@@ -8,7 +8,7 @@ import tempfile
 from art.config import ArtConfig, FileMapEntry
 from art.excs import Problem
 from art.git import git_clone
-from art.manifest import generate_manifest
+from art.manifest import Manifest
 from art.prepare import fork_configs_from_work_dir, run_prepare
 from art.write import write
 
@@ -64,7 +64,7 @@ def process_config_postfork(args, config):
     for file in args.files or ():
         config.file_map.append(FileMapEntry(source=file))
     run_prepare(config)
-    manifest = generate_manifest(config)
+    manifest = Manifest.generate(config)
     if not manifest["files"]:
         raise Problem("No files were copied (use config or --file?)")
     suffixes = []
