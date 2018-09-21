@@ -8,7 +8,7 @@ from art.command import run_command
 @pytest.mark.parametrize("source", ["local", "git"])
 def test_selftest(tmpdir, source, monkeypatch):
     # Hack: Disable pytest-cov subprocess coverage...
-    monkeypatch.delitem(os.environ, "COV_CORE_SOURCE")
+    monkeypatch.delitem(os.environ, "COV_CORE_SOURCE", raising=False)
 
     tmpdir = str(tmpdir)
     suffix = "latest"
