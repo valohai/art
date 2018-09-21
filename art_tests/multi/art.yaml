@@ -2,6 +2,8 @@ configs:
   a:
     file_map:
     - source: a.txt
+    - source: aa/*.txt
+    wrap: wrap.tar
   b:
     file_map:
     - source: b.txt

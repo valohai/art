@@ -6,6 +6,7 @@ config_keys = {
     "prepare": listify,
     "ref": str,
     "repo_url": str,
+    "wrap": str,
 }
 
 
@@ -33,6 +34,7 @@ class ArtConfig:
         self.ref = None
         self.prepare = []
         self.file_map = []
+        self.wrap = None
 
     def update_from(self, data):
         for key, cast in config_keys.items():

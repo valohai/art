@@ -18,7 +18,9 @@ def git_clone(config):
 
 def describe(config):
     description = (
-        check_output(["git", "describe", "--always", "--long", "--dirty"], cwd=config.work_dir)
+        check_output(
+            ["git", "describe", "--always", "--long", "--dirty"], cwd=config.work_dir
+        )
         .decode()
         .strip()
     )

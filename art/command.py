@@ -11,6 +11,7 @@ from art.git import git_clone
 from art.manifest import Manifest
 from art.prepare import fork_configs_from_work_dir, run_prepare
 from art.write import write
+from art.wrap import create_wrapfile
 
 
 def get_argument_parser():
@@ -73,8 +74,17 @@ def process_config_postfork(args, config):
     suffixes.extend(args.suffixes or ())
     if not suffixes:
         raise Problem("No write destinations (use --suffix?)")
+    wrap_temp = create_wrapfile(config, manifest)
     for suffix in suffixes:
-        write(config, dest=config.dest, path_suffix=suffix, manifest=manifest)
+        write(
+            config,
+            dest=config.dest,
+            path_suffix=suffix,
+            manifest=manifest,
+            wrap_filename=wrap_temp,
+        )
+    if wrap_temp:
+        os.unlink(wrap_temp)
 
 
 if __name__ == "__main__":

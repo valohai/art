@@ -21,7 +21,7 @@ def _write_file(dest, source_fp):
         raise ValueError("Invalid destination: %s" % dest)
 
 
-def write(config, *, dest, path_suffix, manifest):
+def write(config, *, dest, path_suffix, manifest, wrap_filename=None):
     dest = posixpath.join(dest, path_suffix)
     for dest_filename, fileinfo in manifest["files"].items():
         dest_path = posixpath.join(dest, dest_filename)
@@ -29,5 +29,10 @@ def write(config, *, dest, path_suffix, manifest):
         with open(local_path, "rb") as infp:
             _write_file(dest_path, infp)
 
-    _write_file(posixpath.join(dest, ".manifest.json"), io.BytesIO(manifest.as_json_bytes()))
+    _write_file(
+        posixpath.join(dest, ".manifest.json"), io.BytesIO(manifest.as_json_bytes())
+    )
 
+    if config.wrap and wrap_filename:
+        with open(wrap_filename, "rb") as infp:
+            _write_file(posixpath.join(dest, config.wrap), infp)

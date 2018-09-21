@@ -11,9 +11,7 @@ log = logging.getLogger(__name__)
 
 class Manifest(dict):
     def as_json_bytes(self):
-        return json.dumps(
-            self, sort_keys=True, ensure_ascii=False, indent=2
-        ).encode()
+        return json.dumps(self, sort_keys=True, ensure_ascii=False, indent=2).encode()
 
     @classmethod
     def generate(cls, config):
