@@ -17,6 +17,7 @@ def generate_manifest(config):
     return {
         "ctime": time.time(),
         "rev": rev_description,
+        "name": config.name,
         "repo": {"url": config.repo_url, "ref": config.ref},
         "files": get_files_for_manifest(config),
     }

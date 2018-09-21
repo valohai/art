@@ -1,0 +1,7 @@
+configs:
+  a:
+    file_map:
+    - source: a.txt
+  b:
+    file_map:
+    - source: b.txt

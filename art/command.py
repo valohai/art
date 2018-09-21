@@ -6,9 +6,10 @@ import shutil
 import tempfile
 
 from art.config import ArtConfig, FileMapEntry
+from art.excs import Problem
 from art.git import git_clone
 from art.manifest import generate_manifest
-from art.prepare import run_prepare, update_config_from_work_dir
+from art.prepare import fork_configs_from_work_dir, run_prepare
 from art.write import write
 
 
@@ -18,6 +19,7 @@ def get_argument_parser():
     ap.add_argument("--git-ref", default="master")
     ap.add_argument("--local-source")
     ap.add_argument("--dest", "-d")
+    ap.add_argument("--config-file", default="art.yaml")
     ap.add_argument("--suffix", "-s", dest="suffixes", action="append")
     ap.add_argument("--suffix-description", action="store_true")
     ap.add_argument(
@@ -45,26 +47,32 @@ def run_command(argv=None):
     else:
         ap.error("Either a git source or a local source must be defined")
 
-    update_config_from_work_dir(config)
-    if not config.dest:
-        ap.error("No destination specified (on command line or in config in source)")
+    for config in fork_configs_from_work_dir(config, filename=args.config_file):
+        try:
+            process_config_postfork(args, config)
+        except Problem as p:
+            ap.error("config %s: %s" % (config.name, p))
 
+
+def process_config_postfork(args, config):
+    if not config.dest:
+        raise Problem(
+            "No destination specified (on command line or in config in source)"
+        )
     if config.dest.startswith("./"):
         config.dest = os.path.abspath(config.dest)
-
     for file in args.files or ():
         config.file_map.append(FileMapEntry(source=file))
-
     run_prepare(config)
     manifest = generate_manifest(config)
     if not manifest["files"]:
-        ap.error("No files were copied (use config or --file?)")
+        raise Problem("No files were copied (use config or --file?)")
     suffixes = []
     if args.suffix_description and manifest["rev"]["description"]:
         suffixes.append(manifest["rev"]["description"])
     suffixes.extend(args.suffixes or ())
     if not suffixes:
-        raise ValueError("No write destinations (use --suffix?)")
+        raise Problem("No write destinations (use --suffix?)")
     for suffix in suffixes:
         write(config, dest=config.dest, path_suffix=suffix, manifest=manifest)
 

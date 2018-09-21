@@ -28,6 +28,7 @@ class ArtConfig:
     def __init__(self):
         self.work_dir = None
         self.dest = None
+        self.name = None
         self.repo_url = None
         self.ref = None
         self.prepare = []
