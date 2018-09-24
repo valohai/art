@@ -16,17 +16,50 @@ from art.wrap import create_wrapfile
 
 def get_argument_parser():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--git-source")
-    ap.add_argument("--git-ref", default="master")
-    ap.add_argument("--local-source")
-    ap.add_argument("--dest", "-d")
-    ap.add_argument("--config-file", default="art.yaml")
-    ap.add_argument("--suffix", "-s", dest="suffixes", action="append")
-    ap.add_argument("--suffix-description", action="store_true")
-    ap.add_argument(
-        "--debug", dest="log_level", const=logging.DEBUG, action="store_const"
+    source_group = ap.add_argument_group("Source options")
+    source_group.add_argument(
+        "--git-source", metavar="URL", help="Git repository URL (passed to `git clone`)"
     )
-    ap.add_argument("--file", dest="files", action="append")
+    source_group.add_argument(
+        "--git-ref", default="master", help="Git reference (default %(default)s)"
+    )
+    source_group.add_argument("--local-source", help="Local source path")
+    source_group.add_argument(
+        "--config-file",
+        default="art.yaml",
+        help="Configuration filename within the source (default %(default)s)",
+    )
+
+    dest_group = ap.add_argument_group("Destination options")
+
+    dest_group.add_argument(
+        "--dest", "-d", help="Destination base path, e.g. `./dist`, `s3://artifacts/foo"
+    )
+    dest_group.add_argument(
+        "--suffix",
+        "-s",
+        dest="suffixes",
+        action="append",
+        help="Destination suffix (e.g. `release`)",
+    )
+    dest_group.add_argument(
+        "--suffix-description",
+        action="store_true",
+        help="Attempt to derive a suffix from the `git describe` of the source",
+    )
+    ap.add_argument(
+        "--debug",
+        dest="log_level",
+        const=logging.DEBUG,
+        action="store_const",
+        help="Be debuggingly verbose",
+    )
+    ap.add_argument(
+        "--file",
+        dest="files",
+        action="append",
+        help="Add a file glob for adding to the destination. You should probably use a configuration file instead.",
+    )
     return ap
 
 
