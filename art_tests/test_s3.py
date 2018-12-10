@@ -9,7 +9,7 @@ def test_s3_acl(mocker):
     x = cli.put_object  # avoid magic
     with mocker.patch.object(cli, "put_object"):
         body = io.BytesIO(b"test")
-        _write_file("s3://bukkit/key?acl=public-read", body)
+        _write_file("s3://bukkit/key", body, options={"acl": "public-read"})
         cli.put_object.assert_called_with(
             Bucket="bukkit", Key="key", ACL="public-read", Body=body
         )
