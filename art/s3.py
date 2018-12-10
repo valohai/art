@@ -1,5 +1,5 @@
 import logging
-from urllib.parse import parse_qsl, urlparse
+from urllib.parse import urlparse
 
 _s3_client = None
 log = logging.getLogger(__name__)
@@ -14,13 +14,13 @@ def get_s3_client():
     return _s3_client
 
 
-def s3_write(url, source_fp):
+def s3_write(url, source_fp, options):
     purl = urlparse(url)
     s3_client = get_s3_client()
     assert purl.scheme == "s3"
+    assert not purl.query
 
-    query = dict(parse_qsl(purl.query) if purl.query else ())
-    acl = query.get("acl")
+    acl = options.get("acl")
 
     kwargs = dict(Bucket=purl.netloc, Key=purl.path.lstrip("/"), Body=source_fp)
     if acl:
