@@ -10,8 +10,8 @@ from art.excs import Problem
 from art.git import git_clone
 from art.manifest import Manifest
 from art.prepare import fork_configs_from_work_dir, run_prepare
-from art.write import write
 from art.wrap import create_wrapfile
+from art.write import write
 
 
 def get_argument_parser():

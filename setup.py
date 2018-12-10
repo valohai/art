@@ -4,7 +4,7 @@ from setuptools import setup
 
 from art import __version__
 
-tests_require = ['pytest', 'pytest-cov']
+tests_require = ['pytest', 'pytest-cov', 'pytest-mock']
 setup(
     name='art',
     short_description='Artifact manager',
