@@ -3,11 +3,15 @@ import logging
 import os
 import tarfile
 import tempfile
+from typing import Optional
+
+from art.config import ArtConfig
+from art.manifest import Manifest
 
 log = logging.getLogger(__name__)
 
 
-def create_wrapfile(config, manifest):
+def create_wrapfile(config: ArtConfig, manifest: Manifest) -> Optional[str]:
     if not config.wrap:
         return None
     wrap_temp = tempfile.mktemp(prefix="art-wrap-", suffix=".tar")

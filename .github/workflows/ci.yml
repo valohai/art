@@ -28,4 +28,4 @@ jobs:
       - run: isort --check .
       - run: black --check .
       - run: flake8
-      - run: mypy art
+      - run: mypy art --strict

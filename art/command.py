@@ -4,6 +4,7 @@ import logging
 import os
 import shutil
 import tempfile
+from typing import List, Optional
 
 from art.config import ArtConfig, FileMapEntry
 from art.excs import Problem
@@ -14,7 +15,7 @@ from art.wrap import create_wrapfile
 from art.write import write
 
 
-def get_argument_parser():
+def get_argument_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser()
     source_group = ap.add_argument_group("Source options")
     source_group.add_argument(
@@ -66,23 +67,34 @@ def get_argument_parser():
     return ap
 
 
-def run_command(argv=None):
+def run_command(argv: Optional[List[str]] = None) -> None:
     ap = get_argument_parser()
     args = ap.parse_args(argv)
     logging.basicConfig(level=(args.log_level or logging.INFO))
 
-    config = ArtConfig()
-    config.update_from({"dest": args.dest})
+    config_args = {"dest": args.dest, "name": ""}
+    is_git = False
     if args.git_source:
-        config.repo_url = args.git_source
-        config.ref = args.git_ref
-        config.work_dir = tempfile.mkdtemp(prefix="art-git-")
-        git_clone(config)
-        atexit.register(shutil.rmtree, config.work_dir)
+        config_args.update(
+            repo_url=args.git_source,
+            ref=args.git_ref,
+            work_dir=tempfile.mkdtemp(prefix="art-git-"),
+        )
+        is_git = True
     elif args.local_source:
-        config.repo_url = config.work_dir = os.path.abspath(args.local_source)
+        work_dir = os.path.abspath(args.local_source)
+        config_args.update(
+            repo_url=work_dir,
+            work_dir=work_dir,
+        )
     else:
         ap.error("Either a git source or a local source must be defined")
+
+    config = ArtConfig(**config_args)
+
+    if is_git:
+        git_clone(config)
+        atexit.register(shutil.rmtree, config.work_dir)
 
     for config in fork_configs_from_work_dir(config, filename=args.config_file):
         try:
@@ -91,7 +103,7 @@ def run_command(argv=None):
             ap.error("config %s: %s" % (config.name, p))
 
 
-def process_config_postfork(args, config):
+def process_config_postfork(args: argparse.Namespace, config: ArtConfig) -> None:
     if not config.dest:
         raise Problem(
             "No destination specified (on command line or in config in source)"

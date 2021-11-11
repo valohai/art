@@ -3,8 +3,10 @@ from art.config import ArtConfig
 from art.manifest import Manifest
 
 
-def test_dest_options(mocker):
-    cfg = ArtConfig()
+def test_dest_options(mocker, tmpdir):
+    cfg = ArtConfig(
+        work_dir=str(tmpdir), dest=str(tmpdir), name="", repo_url=str(tmpdir)
+    )
     mf = Manifest(files={})
     wf = mocker.patch("art.write._write_file")
     art.write.write(
