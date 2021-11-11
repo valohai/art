@@ -29,7 +29,7 @@ def fork_configs_from_data(
         subcfg.update_from(cfg_data)
         subcfg.name = name or "default"
         if name:
-            subcfg.dest += "/%s" % name
+            subcfg.dests = [dest + "/%s" % name for dest in subcfg.dests]
         yield subcfg
 
 
