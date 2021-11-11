@@ -1,5 +1,6 @@
 import argparse
 import atexit
+import dataclasses
 import logging
 import os
 import shutil
@@ -7,6 +8,7 @@ import tempfile
 from typing import List, Optional
 
 from art.config import ArtConfig, FileMapEntry
+from art.consts import DEFAULT_CONFIG_FILENAME
 from art.excs import Problem
 from art.git import git_clone
 from art.manifest import Manifest
@@ -27,7 +29,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
     source_group.add_argument("--local-source", help="Local source path")
     source_group.add_argument(
         "--config-file",
-        default="art.yaml",
+        default=DEFAULT_CONFIG_FILENAME,
         help="Configuration filename within the source (default %(default)s)",
     )
 
@@ -73,12 +75,25 @@ def get_argument_parser() -> argparse.ArgumentParser:
     return ap
 
 
+@dataclasses.dataclass(frozen=True)
+class Args:
+    git_source: Optional[str]
+    git_ref: Optional[str]
+    local_source: Optional[str]
+    dests: List[str]
+    suffixes: List[str]
+    suffix_description: bool
+    log_level: Optional[int]
+    files: List[str]
+    config_file: str = DEFAULT_CONFIG_FILENAME
+
+
 def run_command(argv: Optional[List[str]] = None) -> None:
     ap = get_argument_parser()
-    args = ap.parse_args(argv)
+    args = Args(**vars(ap.parse_args(argv)))
     logging.basicConfig(level=(args.log_level or logging.INFO))
 
-    config_args = {"dests": list(args.dests), "name": ""}
+    config_args: Dict[str, Any] = {"dests": list(args.dests), "name": ""}
     is_git = False
     if args.git_source:
         config_args.update(
@@ -96,7 +111,7 @@ def run_command(argv: Optional[List[str]] = None) -> None:
     else:
         ap.error("Either a git source or a local source must be defined")
 
-    config = ArtConfig(**config_args)  # type: ignore[arg-type]
+    config = ArtConfig(**config_args)
 
     if is_git:
         git_clone(config)
@@ -115,7 +130,7 @@ def clean_dest(dest: str) -> str:
     return dest
 
 
-def process_config_postfork(args: argparse.Namespace, config: ArtConfig) -> None:
+def process_config_postfork(args: Args, config: ArtConfig) -> None:
     if not config.dests:
         raise Problem(
             "No destination(s) specified (on command line or in config in source)"
