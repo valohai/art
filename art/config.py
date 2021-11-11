@@ -31,7 +31,7 @@ class FileMapEntry:
 @dataclasses.dataclass()
 class ArtConfig:
     work_dir: str
-    dest: str
+    dests: List[str]
     name: str
     repo_url: str
     ref: Optional[str] = None

@@ -10,9 +10,10 @@ def test_selftest(tmpdir, source, monkeypatch):
     # Hack: Disable pytest-cov subprocess coverage...
     monkeypatch.delitem(os.environ, "COV_CORE_SOURCE", raising=False)
 
-    tmpdir = str(tmpdir)
+    dest1 = str(tmpdir.join("aaa"))
+    dest2 = str(tmpdir.join("bbb"))
     suffix = "latest"
-    args = ["--dest", tmpdir, "--suffix", suffix]
+    args = ["--dest", dest1, "--dest", dest2, "--suffix", suffix]
     if source == "local":
         art_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), ".."))
         args.extend(["--local-source", art_dir])
@@ -20,4 +21,5 @@ def test_selftest(tmpdir, source, monkeypatch):
         args.extend(["--suffix-description"])
         args.extend(["--git-source", "https://github.com/valohai/art.git"])
     run_command(args)
-    assert os.path.isfile(os.path.join(tmpdir, suffix, "art.whl"))
+    for dest in (dest1, dest2):
+        assert os.path.isfile(os.path.join(dest, suffix, "art.whl"))

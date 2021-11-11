@@ -34,7 +34,12 @@ def get_argument_parser() -> argparse.ArgumentParser:
     dest_group = ap.add_argument_group("Destination options")
 
     dest_group.add_argument(
-        "--dest", "-d", help="Destination base path, e.g. `./dist`, `s3://artifacts/foo"
+        "--dest",
+        "-d",
+        dest="dests",
+        default=[],
+        action="append",
+        help="Destination base path, e.g. `./dist`, `s3://artifacts/foo",
     )
     dest_group.add_argument(
         "--suffix",
@@ -59,6 +64,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
         "--file",
         dest="files",
         action="append",
+        default=[],
         help=(
             "Add a file glob for adding to the destination. "
             "You should probably use a configuration file instead."
@@ -72,7 +78,7 @@ def run_command(argv: Optional[List[str]] = None) -> None:
     args = ap.parse_args(argv)
     logging.basicConfig(level=(args.log_level or logging.INFO))
 
-    config_args = {"dest": args.dest, "name": ""}
+    config_args = {"dests": list(args.dests), "name": ""}
     is_git = False
     if args.git_source:
         config_args.update(
@@ -90,7 +96,7 @@ def run_command(argv: Optional[List[str]] = None) -> None:
     else:
         ap.error("Either a git source or a local source must be defined")
 
-    config = ArtConfig(**config_args)
+    config = ArtConfig(**config_args)  # type: ignore[arg-type]
 
     if is_git:
         git_clone(config)
@@ -103,14 +109,19 @@ def run_command(argv: Optional[List[str]] = None) -> None:
             ap.error("config %s: %s" % (config.name, p))
 
 
+def clean_dest(dest: str) -> str:
+    if dest.startswith("./"):
+        dest = os.path.abspath(dest)
+    return dest
+
+
 def process_config_postfork(args: argparse.Namespace, config: ArtConfig) -> None:
-    if not config.dest:
+    if not config.dests:
         raise Problem(
-            "No destination specified (on command line or in config in source)"
+            "No destination(s) specified (on command line or in config in source)"
         )
-    if config.dest.startswith("./"):
-        config.dest = os.path.abspath(config.dest)
-    for file in args.files or ():
+    config.dests = [clean_dest(dest) for dest in config.dests]
+    for file in args.files:
         config.file_map.append(FileMapEntry(source=file))
     run_prepare(config)
     manifest = Manifest.generate(config)
@@ -123,14 +134,15 @@ def process_config_postfork(args: argparse.Namespace, config: ArtConfig) -> None
     if not suffixes:
         raise Problem("No write destinations (use --suffix?)")
     wrap_temp = create_wrapfile(config, manifest)
-    for suffix in suffixes:
-        write(
-            config,
-            dest=config.dest,
-            path_suffix=suffix,
-            manifest=manifest,
-            wrap_filename=wrap_temp,
-        )
+    for dest in config.dests:
+        for suffix in suffixes:
+            write(
+                config,
+                dest=dest,
+                path_suffix=suffix,
+                manifest=manifest,
+                wrap_filename=wrap_temp,
+            )
     if wrap_temp:
         os.unlink(wrap_temp)
 
