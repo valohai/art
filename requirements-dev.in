@@ -1,4 +1,5 @@
 black
+build
 flake8
 flake8-bugbear
 flake8-docstrings
@@ -10,4 +11,3 @@ pytest
 pytest-cov
 pytest-mock
 types-PyYAML
-wheel
