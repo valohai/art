@@ -58,7 +58,10 @@ def get_argument_parser():
         "--file",
         dest="files",
         action="append",
-        help="Add a file glob for adding to the destination. You should probably use a configuration file instead.",
+        help=(
+            "Add a file glob for adding to the destination. "
+            "You should probably use a configuration file instead."
+        ),
     )
     return ap
 
