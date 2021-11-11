@@ -1,7 +1,11 @@
 from subprocess import check_call, check_output
+from typing import Any, Dict
+
+from art.config import ArtConfig
 
 
-def git_clone(config):
+def git_clone(config: ArtConfig) -> None:
+    assert config.ref
     check_call(
         [
             "git",
@@ -16,7 +20,7 @@ def git_clone(config):
     )
 
 
-def describe(config):
+def describe(config: ArtConfig) -> Dict[str, Any]:
     description = (
         check_output(
             ["git", "describe", "--always", "--long", "--dirty"], cwd=config.work_dir

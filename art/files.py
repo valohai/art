@@ -1,11 +1,12 @@
 import glob
 import os
 import re
+from typing import Any, Dict, Iterable, Tuple
 
 from art.config import ArtConfig
 
 
-def gather_files(cfg: ArtConfig, base_dir):
+def gather_files(cfg: ArtConfig, base_dir: str) -> Iterable[Tuple[str, str]]:
     base_dir = os.path.abspath(base_dir)
     for fme in cfg.file_map:
         for file in glob.glob(os.path.join(base_dir, fme.source)):
@@ -19,7 +20,7 @@ def gather_files(cfg: ArtConfig, base_dir):
             yield (src_file, dest_file)
 
 
-def get_files_for_manifest(config):
+def get_files_for_manifest(config: ArtConfig) -> Dict[str, Dict[str, Any]]:
     files = {}
     for local_path, remote_path in gather_files(config, config.work_dir):
         stat = os.stat(local_path)

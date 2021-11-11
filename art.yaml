@@ -1,5 +1,5 @@
 prepare:
-  - python3 setup.py -q bdist_wheel
+  - python3 -m build
 file_map:
   - source: dist/*.whl
     strip: 1

@@ -3,14 +3,19 @@ import logging
 import os
 import posixpath
 import shutil
+from typing import IO, Any, Dict, Optional
 from urllib.parse import parse_qsl
 
+from art.config import ArtConfig
+from art.manifest import Manifest
 from art.s3 import s3_write
 
 log = logging.getLogger(__name__)
 
 
-def _write_file(dest, source_fp, options=None):
+def _write_file(
+    dest: str, source_fp: IO[bytes], options: Optional[Dict[str, Any]] = None
+) -> None:
     if options is None:
         options = {}
     if dest.startswith("s3://"):
@@ -24,12 +29,18 @@ def _write_file(dest, source_fp, options=None):
         raise ValueError("Invalid destination: %s" % dest)
 
 
-def write(config, *, dest, path_suffix, manifest, wrap_filename=None):
+def write(
+    config: ArtConfig,
+    *,
+    dest: str,
+    path_suffix: str,
+    manifest: Manifest,
+    wrap_filename: Optional[str] = None
+) -> None:
+    options = {}
     if "?" in dest:
-        dest, options = dest.split("?", 2)
-        options = dict(parse_qsl(options))
-    else:
-        options = {}
+        dest, options_str = dest.split("?", 2)
+        options.update(dict(parse_qsl(options_str)))
 
     dest = posixpath.join(dest, path_suffix)
     for dest_filename, fileinfo in manifest["files"].items():

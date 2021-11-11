@@ -1,11 +1,12 @@
 import logging
+from typing import IO, Any, Dict
 from urllib.parse import urlparse
 
 _s3_client = None
 log = logging.getLogger(__name__)
 
 
-def get_s3_client():
+def get_s3_client() -> Any:
     global _s3_client
     if not _s3_client:
         import boto3
@@ -14,7 +15,7 @@ def get_s3_client():
     return _s3_client
 
 
-def s3_write(url, source_fp, options):
+def s3_write(url: str, source_fp: IO[bytes], options: Dict[str, Any]) -> None:
     purl = urlparse(url)
     s3_client = get_s3_client()
     assert purl.scheme == "s3"
