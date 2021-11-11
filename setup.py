@@ -7,7 +7,7 @@ from art import __version__
 tests_require = ['pytest', 'pytest-cov', 'pytest-mock']
 setup(
     name='art',
-    short_description='Artifact manager',
+    description='Artifact manager',
     author='Valohai',
     author_email='hait@valohai.com',
     license='MIT',
