@@ -14,6 +14,6 @@ jobs:
         with:
           python-version: 3.9
       - uses: actions/checkout@v2
-      - run: pip install --user -e .[test] codecov
+      - run: pip install -e . -r requirements-dev.txt
       - run: py.test --cov art -vv .
       - uses: codecov/codecov-action@v2
