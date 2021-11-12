@@ -15,7 +15,9 @@ def get_s3_client() -> Any:
     return _s3_client
 
 
-def s3_write(url: str, source_fp: IO[bytes], options: Dict[str, Any]) -> None:
+def s3_write(
+    url: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run: bool
+) -> None:
     purl = urlparse(url)
     s3_client = get_s3_client()
     assert purl.scheme == "s3"
@@ -26,5 +28,9 @@ def s3_write(url: str, source_fp: IO[bytes], options: Dict[str, Any]) -> None:
     kwargs = dict(Bucket=purl.netloc, Key=purl.path.lstrip("/"), Body=source_fp)
     if acl:
         kwargs["ACL"] = acl
+
+    if dry_run:
+        log.info("Dry-run: would write to S3 (ACL %s): %s", acl, url)
+        return
     s3_client.put_object(**kwargs)
-    log.info("Wrote to S3 (ACL %s): %s", kwargs.get("ACL"), url)
+    log.info("Wrote to S3 (ACL %s): %s", acl, url)
