@@ -5,7 +5,7 @@ import logging
 import os
 import shutil
 import tempfile
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from art.config import ArtConfig, FileMapEntry
 from art.consts import DEFAULT_CONFIG_FILENAME
@@ -56,6 +56,12 @@ def get_argument_parser() -> argparse.ArgumentParser:
         help="Attempt to derive a suffix from the `git describe` of the source",
     )
     ap.add_argument(
+        "--dry-run",
+        default=False,
+        action="store_true",
+        help="Do everything but actually write files to destinations",
+    )
+    ap.add_argument(
         "--debug",
         dest="log_level",
         const=logging.DEBUG,
@@ -86,6 +92,7 @@ class Args:
     log_level: Optional[int]
     files: List[str]
     config_file: str = DEFAULT_CONFIG_FILENAME
+    dry_run: bool = False
 
 
 def run_command(argv: Optional[List[str]] = None) -> None:
@@ -157,6 +164,7 @@ def process_config_postfork(args: Args, config: ArtConfig) -> None:
                 path_suffix=suffix,
                 manifest=manifest,
                 wrap_filename=wrap_temp,
+                dry_run=args.dry_run,
             )
     if wrap_temp:
         os.unlink(wrap_temp)

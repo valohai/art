@@ -10,7 +10,11 @@ def test_dest_options(mocker, tmpdir):
     mf = Manifest(files={})
     wf = mocker.patch("art.write._write_file")
     art.write.write(
-        cfg, dest="derp://foo/bar/?acl=quux", path_suffix="blag", manifest=mf
+        cfg,
+        dest="derp://foo/bar/?acl=quux",
+        path_suffix="blag",
+        manifest=mf,
+        dry_run=False,
     )
     call_kwargs = wf.call_args[1]
     assert call_kwargs["options"] == {"acl": "quux"}
