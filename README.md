@@ -1,7 +1,7 @@
 art – an artifact uploader
 ==========================
 
-[![CircleCI](https://circleci.com/gh/valohai/art.svg?style=svg)](https://circleci.com/gh/valohai/art)
+[![CI](https://github.com/valohai/art/actions/workflows/ci.yml/badge.svg)](https://github.com/valohai/art/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/valohai/art/branch/master/graph/badge.svg)](https://codecov.io/gh/valohai/art)
 
 Art is a simple tool to manage artifacts to deploy.
