@@ -124,11 +124,11 @@ def run_command(argv: Optional[List[str]] = None) -> None:
         git_clone(config)
         atexit.register(shutil.rmtree, config.work_dir)
 
-    for config in fork_configs_from_work_dir(config, filename=args.config_file):
+    for forked_config in fork_configs_from_work_dir(config, filename=args.config_file):
         try:
-            process_config_postfork(args, config)
+            process_config_postfork(args, forked_config)
         except Problem as p:
-            ap.error("config %s: %s" % (config.name, p))
+            ap.error("config %s: %s" % (forked_config.name, p))
 
 
 def clean_dest(dest: str) -> str:
