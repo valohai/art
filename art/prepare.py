@@ -22,14 +22,14 @@ def fork_configs_from_data(
     base_cfg: ArtConfig, cfg_data: Dict[str, Any]
 ) -> Iterable[ArtConfig]:
     if not isinstance(cfg_data, dict):
-        raise TypeError("Invalid configuration (must be a dict, got %r)" % cfg_data)
+        raise TypeError(f"Invalid configuration (must be a dict, got {cfg_data!r})")
     configs_dict = cfg_data["configs"] if "configs" in cfg_data else {None: cfg_data}
     for name, cfg_data in configs_dict.items():
         subcfg = copy.deepcopy(base_cfg)
         subcfg.update_from(cfg_data)
         subcfg.name = name or "default"
         if name:
-            subcfg.dests = [dest + "/%s" % name for dest in subcfg.dests]
+            subcfg.dests = [f"{dest}/{name}" for dest in subcfg.dests]
         yield subcfg
 
 
@@ -38,11 +38,11 @@ def fork_configs_from_work_dir(
 ) -> Iterable[ArtConfig]:
     repo_cfg_path = os.path.join(base_cfg.work_dir, filename)
     if os.path.isfile(repo_cfg_path):
-        log.info("Updating config from %s" % repo_cfg_path)
-        with open(repo_cfg_path, "r") as infp:
+        log.info(f"Updating config from {repo_cfg_path}")
+        with open(repo_cfg_path) as infp:
             repo_cfg_data = yaml.safe_load(infp)
         return fork_configs_from_data(base_cfg, repo_cfg_data)
     if filename != DEFAULT_CONFIG_FILENAME:
-        raise ValueError("non-default config filename %s not found" % filename)
-    log.info("No config updates from file (%s didn't exist in source)" % filename)
+        raise ValueError(f"non-default config filename {filename} not found")
+    log.info(f"No config updates from file ({filename} didn't exist in source)")
     return [copy.deepcopy(base_cfg)]
