@@ -31,7 +31,7 @@ def _get_writer_for_dest(dest: str) -> Callable:  # type: ignore[type-arg]
         return s3_write
     if dest.startswith("/"):  # Local path
         return local_write
-    raise ValueError("Invalid destination: %s" % dest)
+    raise ValueError(f"Invalid destination: {dest}")
 
 
 def local_write(
