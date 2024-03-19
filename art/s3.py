@@ -15,9 +15,7 @@ def get_s3_client() -> Any:
     return _s3_client
 
 
-def s3_write(
-    url: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run: bool
-) -> None:
+def s3_write(url: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run: bool) -> None:
     purl = urlparse(url)
     s3_client = get_s3_client()
     assert purl.scheme == "s3"

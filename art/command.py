@@ -20,12 +20,8 @@ from art.write import write
 def get_argument_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser()
     source_group = ap.add_argument_group("Source options")
-    source_group.add_argument(
-        "--git-source", metavar="URL", help="Git repository URL (passed to `git clone`)"
-    )
-    source_group.add_argument(
-        "--git-ref", default="master", help="Git reference (default %(default)s)"
-    )
+    source_group.add_argument("--git-source", metavar="URL", help="Git repository URL (passed to `git clone`)")
+    source_group.add_argument("--git-ref", default="master", help="Git reference (default %(default)s)")
     source_group.add_argument("--local-source", help="Local source path")
     source_group.add_argument(
         "--config-file",
@@ -74,8 +70,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         help=(
-            "Add a file glob for adding to the destination. "
-            "You should probably use a configuration file instead."
+            "Add a file glob for adding to the destination. " "You should probably use a configuration file instead."
         ),
     )
     return ap
@@ -139,9 +134,7 @@ def clean_dest(dest: str) -> str:
 
 def process_config_postfork(args: Args, config: ArtConfig) -> None:
     if not config.dests:
-        raise Problem(
-            "No destination(s) specified (on command line or in config in source)"
-        )
+        raise Problem("No destination(s) specified (on command line or in config in source)")
     config.dests = [clean_dest(dest) for dest in config.dests]
     for file in args.files:
         config.file_map.append(FileMapEntry(source=file))
