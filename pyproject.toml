@@ -38,3 +38,31 @@ path = "art/__init__.py"
 include = [
     "/art",
 ]
+
+[tool.pytest.ini_options]
+norecursedirs = [".git", ".tox"]
+
+[tool.ruff.lint]
+ignore = [
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D107",
+    "D211",
+    "D213",
+    "SIM105",
+]
+select = [
+    "D",
+    "E",
+    "F",
+    "I",
+    "SIM",
+    "W",
+]
+
+[[tool.mypy.overrides]]
+module = "boto3.*"
+ignore_missing_imports = true

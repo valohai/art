@@ -23,7 +23,7 @@ def fork_configs_from_data(
 ) -> Iterable[ArtConfig]:
     if not isinstance(cfg_data, dict):
         raise TypeError(f"Invalid configuration (must be a dict, got {cfg_data!r})")
-    configs_dict = cfg_data["configs"] if "configs" in cfg_data else {None: cfg_data}
+    configs_dict = cfg_data.get("configs", {None: cfg_data})
     for name, cfg_data in configs_dict.items():
         subcfg = copy.deepcopy(base_cfg)
         subcfg.update_from(cfg_data)
