@@ -16,6 +16,18 @@ dependencies = [
     "pyyaml",
 ]
 
+[project.optional-dependencies]
+mypy = [
+    "mypy~=1.9.0",
+    "types-PyYAML",
+]
+test = [
+    "build",
+    "pytest-cov",
+    "pytest-mock~=3.12",
+    "pytest~=8.1",
+]
+
 [project.scripts]
 art = "art.command:run_command"
 
