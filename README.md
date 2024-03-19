@@ -5,7 +5,7 @@ art – an artifact uploader
 [![codecov](https://codecov.io/gh/valohai/art/branch/master/graph/badge.svg)](https://codecov.io/gh/valohai/art)
 
 Art is a simple tool to manage artifacts to deploy.
- 
+
 The original use case was to transition an ops workflow from cloning full Git repositories
 with deploy keys, but there are probably other uses.
 
@@ -71,8 +71,8 @@ the following files would be pushed to S3:
 * Wrapfiles are useful with e.g. Python wheels, which need to have their original filenames intact. Wrapping wheel artifacts into a wrapfile makes it possible to download a single file with a well-known name, unpack it and do e.g. `pip install *.whl`. It should be noted that the wrapfile is, on purpose, a [tarbomb](https://en.wikipedia.org/wiki/Tar_(computing)#Tarbomb).
 * S3 access assumes your S3 credentials are available in one of the ways supported by the Boto library.
 * The `--suffix-description` option makes Art autogenerate an additional suffix based on the `git describe --always --long --dirty` output of the source, so you get a canonical URL for the particular version. (That description output is also saved in the manifest file, so you can cross-correlate between an arbitrary suffix and this.)
-* For S3 destinations, you can add an `?acl=...` parameter, where `...` must be one of S3's pre-canned ACLs:  
-  `'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control'`  
+* For S3 destinations, you can add an `?acl=...` parameter, where `...` must be one of S3's pre-canned ACLs:
+  `'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control'`
   The default is whatever is the default for your bucket.
 
 

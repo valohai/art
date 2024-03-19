@@ -18,12 +18,10 @@ def run_prepare(config: ArtConfig) -> None:
         check_call(prepare_step, shell=True, cwd=config.work_dir)
 
 
-def fork_configs_from_data(
-    base_cfg: ArtConfig, cfg_data: Dict[str, Any]
-) -> Iterable[ArtConfig]:
+def fork_configs_from_data(base_cfg: ArtConfig, cfg_data: Dict[str, Any]) -> Iterable[ArtConfig]:
     if not isinstance(cfg_data, dict):
         raise TypeError(f"Invalid configuration (must be a dict, got {cfg_data!r})")
-    configs_dict = cfg_data["configs"] if "configs" in cfg_data else {None: cfg_data}
+    configs_dict = cfg_data.get("configs", {None: cfg_data})
     for name, cfg_data in configs_dict.items():
         subcfg = copy.deepcopy(base_cfg)
         subcfg.update_from(cfg_data)
@@ -33,9 +31,7 @@ def fork_configs_from_data(
         yield subcfg
 
 
-def fork_configs_from_work_dir(
-    base_cfg: ArtConfig, filename: str = DEFAULT_CONFIG_FILENAME
-) -> Iterable[ArtConfig]:
+def fork_configs_from_work_dir(base_cfg: ArtConfig, filename: str = DEFAULT_CONFIG_FILENAME) -> Iterable[ArtConfig]:
     repo_cfg_path = os.path.join(base_cfg.work_dir, filename)
     if os.path.isfile(repo_cfg_path):
         log.info(f"Updating config from {repo_cfg_path}")

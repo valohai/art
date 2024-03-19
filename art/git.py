@@ -22,16 +22,8 @@ def git_clone(config: ArtConfig) -> None:
 
 def describe(config: ArtConfig) -> Dict[str, Any]:
     description = (
-        check_output(
-            ["git", "describe", "--always", "--long", "--dirty"], cwd=config.work_dir
-        )
-        .decode()
-        .strip()
+        check_output(["git", "describe", "--always", "--long", "--dirty"], cwd=config.work_dir).decode().strip()
     )
-    rev = (
-        check_output(["git", "rev-parse", "--", "HEAD"], cwd=config.work_dir)
-        .decode()
-        .strip()
-    )
+    rev = check_output(["git", "rev-parse", "--", "HEAD"], cwd=config.work_dir).decode().strip()
 
     return {"id": rev, "description": description}

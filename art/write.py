@@ -34,9 +34,7 @@ def _get_writer_for_dest(dest: str) -> Callable:  # type: ignore[type-arg]
     raise ValueError(f"Invalid destination: {dest}")
 
 
-def local_write(
-    dest: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run: bool
-) -> None:
+def local_write(dest: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run: bool) -> None:
     if dry_run:
         log.info("Dry-run: Would have written local file %s", dest)
         return
