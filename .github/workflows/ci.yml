@@ -10,24 +10,26 @@ jobs:
   Test:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
+          cache: pip
           python-version: 3.9
-      - uses: actions/checkout@v2
       - run: pip install -e .[test]
       - run: py.test --cov art -vv .
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v4
   Mypy:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
+          cache: pip
           python-version: 3.9
-      - uses: actions/checkout@v2
       - run: pip install -e .[mypy]
       - run: mypy art --strict
   Lint:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: pre-commit/action@v3.0.0
+      - uses: actions/checkout@v4
+      - uses: pre-commit/action@v3.0.1
