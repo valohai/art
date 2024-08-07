@@ -5,10 +5,11 @@ import logging
 import os
 import shutil
 import tempfile
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from art.config import ArtConfig, FileMapEntry
 from art.consts import DEFAULT_CONFIG_FILENAME
+from art.context import ArtContext
 from art.excs import Problem
 from art.git import git_clone
 from art.manifest import Manifest
@@ -95,33 +96,35 @@ def run_command(argv: Optional[List[str]] = None) -> None:
     args = Args(**vars(ap.parse_args(argv)))
     logging.basicConfig(level=(args.log_level or logging.INFO))
 
-    config_args: Dict[str, Any] = {"dests": list(args.dests), "name": ""}
-    is_git = False
     if args.git_source:
-        config_args.update(
+        work_dir = tempfile.mkdtemp(prefix="art-git-")
+        atexit.register(shutil.rmtree, work_dir)
+        config = ArtConfig(
+            dests=list(args.dests),
+            name="",
             repo_url=args.git_source,
             ref=args.git_ref,
-            work_dir=tempfile.mkdtemp(prefix="art-git-"),
+            work_dir=work_dir,
         )
-        is_git = True
+        git_clone(config)
     elif args.local_source:
         work_dir = os.path.abspath(args.local_source)
-        config_args.update(
+        config = ArtConfig(
+            dests=list(args.dests),
+            name="",
             repo_url=work_dir,
             work_dir=work_dir,
         )
     else:
         ap.error("Either a git source or a local source must be defined")
-
-    config = ArtConfig(**config_args)
-
-    if is_git:
-        git_clone(config)
-        atexit.register(shutil.rmtree, config.work_dir)
+        return
+    context = ArtContext(
+        dry_run=bool(args.dry_run),
+    )
 
     for forked_config in fork_configs_from_work_dir(config, filename=args.config_file):
         try:
-            process_config_postfork(args, forked_config)
+            process_config_postfork(context, args, forked_config)
         except Problem as p:
             ap.error(f"config {forked_config.name}: {p}")
 
@@ -132,7 +135,11 @@ def clean_dest(dest: str) -> str:
     return dest
 
 
-def process_config_postfork(args: Args, config: ArtConfig) -> None:
+def process_config_postfork(
+    context: ArtContext,
+    args: Args,
+    config: ArtConfig,
+) -> None:
     if not config.dests:
         raise Problem("No destination(s) specified (on command line or in config in source)")
     config.dests = [clean_dest(dest) for dest in config.dests]
@@ -152,12 +159,12 @@ def process_config_postfork(args: Args, config: ArtConfig) -> None:
     for dest in config.dests:
         for suffix in suffixes:
             write(
-                config,
+                context=context,
+                config=config,
                 dest=dest,
                 path_suffix=suffix,
                 manifest=manifest,
                 wrap_filename=wrap_temp,
-                dry_run=args.dry_run,
             )
     if wrap_temp:
         os.unlink(wrap_temp)

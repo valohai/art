@@ -2,6 +2,8 @@ import logging
 from typing import IO, Any, Dict
 from urllib.parse import urlparse
 
+from art.context import ArtContext
+
 _s3_client = None
 log = logging.getLogger(__name__)
 
@@ -15,7 +17,13 @@ def get_s3_client() -> Any:
     return _s3_client
 
 
-def s3_write(url: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run: bool) -> None:
+def s3_write(
+    url: str,
+    source_fp: IO[bytes],
+    *,
+    options: Dict[str, Any],
+    context: ArtContext,
+) -> None:
     purl = urlparse(url)
     s3_client = get_s3_client()
     assert purl.scheme == "s3"
@@ -27,7 +35,7 @@ def s3_write(url: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run
     if acl:
         kwargs["ACL"] = acl
 
-    if dry_run:
+    if context.dry_run:
         log.info("Dry-run: would write to S3 (ACL %s): %s", acl, url)
         return
     s3_client.put_object(**kwargs)

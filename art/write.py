@@ -7,6 +7,7 @@ from typing import IO, Any, Callable, Dict, Optional
 from urllib.parse import parse_qsl
 
 from art.config import ArtConfig
+from art.context import ArtContext
 from art.manifest import Manifest
 from art.s3 import s3_write
 
@@ -17,13 +18,13 @@ def _write_file(
     dest: str,
     source_fp: IO[bytes],
     *,
+    context: ArtContext,
     options: Optional[Dict[str, Any]] = None,
-    dry_run: bool = False,
 ) -> None:
     if options is None:
         options = {}
     writer = _get_writer_for_dest(dest)
-    writer(dest, source_fp, options=options, dry_run=dry_run)
+    writer(dest, source_fp, options=options, context=context)
 
 
 def _get_writer_for_dest(dest: str) -> Callable:  # type: ignore[type-arg]
@@ -34,8 +35,14 @@ def _get_writer_for_dest(dest: str) -> Callable:  # type: ignore[type-arg]
     raise ValueError(f"Invalid destination: {dest}")
 
 
-def local_write(dest: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run: bool) -> None:
-    if dry_run:
+def local_write(
+    dest: str,
+    source_fp: IO[bytes],
+    *,
+    context: ArtContext,
+    options: Dict[str, Any],
+) -> None:
+    if context.dry_run:
         log.info("Dry-run: Would have written local file %s", dest)
         return
     os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -45,12 +52,12 @@ def local_write(dest: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry
 
 
 def write(
-    config: ArtConfig,
     *,
+    context: ArtContext,
+    config: ArtConfig,
     dest: str,
     path_suffix: str,
     manifest: Manifest,
-    dry_run: bool,
     wrap_filename: Optional[str] = None,
 ) -> None:
     options = {}
@@ -63,13 +70,18 @@ def write(
         dest_path = posixpath.join(dest, dest_filename)
         local_path = os.path.join(config.work_dir, fileinfo["path"])
         with open(local_path, "rb") as infp:
-            _write_file(dest_path, infp, options=options, dry_run=dry_run)
+            _write_file(
+                dest_path,
+                infp,
+                context=context,
+                options=options,
+            )
 
     _write_file(
         dest=posixpath.join(dest, ".manifest.json"),
         source_fp=io.BytesIO(manifest.as_json_bytes()),
+        context=context,
         options=options,
-        dry_run=dry_run,
     )
 
     if config.wrap and wrap_filename:
@@ -77,6 +89,6 @@ def write(
             _write_file(
                 dest=posixpath.join(dest, config.wrap),
                 source_fp=infp,
+                context=context,
                 options=options,
-                dry_run=dry_run,
             )
