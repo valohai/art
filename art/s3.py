@@ -1,20 +1,18 @@
 import logging
+from functools import cache
 from typing import IO, Any, Dict
 from urllib.parse import urlparse
 
 from art.context import ArtContext
 
-_s3_client = None
 log = logging.getLogger(__name__)
 
 
+@cache
 def get_s3_client() -> Any:
-    global _s3_client
-    if not _s3_client:
-        import boto3
+    import boto3
 
-        _s3_client = boto3.client("s3")
-    return _s3_client
+    return boto3.client("s3")
 
 
 def s3_write(
