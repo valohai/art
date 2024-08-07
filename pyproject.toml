@@ -24,7 +24,6 @@ mypy = [
 test = [
     "build",
     "pytest-cov",
-    "pytest-mock~=3.12",
     "pytest~=8.1",
 ]
 

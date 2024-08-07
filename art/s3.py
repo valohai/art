@@ -1,21 +1,27 @@
 import logging
+from functools import cache
 from typing import IO, Any, Dict
 from urllib.parse import urlparse
 
-_s3_client = None
+from art.context import ArtContext
+
 log = logging.getLogger(__name__)
 
 
+@cache
 def get_s3_client() -> Any:
-    global _s3_client
-    if not _s3_client:
-        import boto3
+    import boto3
 
-        _s3_client = boto3.client("s3")
-    return _s3_client
+    return boto3.client("s3")
 
 
-def s3_write(url: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run: bool) -> None:
+def s3_write(
+    url: str,
+    source_fp: IO[bytes],
+    *,
+    options: Dict[str, Any],
+    context: ArtContext,
+) -> None:
     purl = urlparse(url)
     s3_client = get_s3_client()
     assert purl.scheme == "s3"
@@ -27,8 +33,12 @@ def s3_write(url: str, source_fp: IO[bytes], *, options: Dict[str, Any], dry_run
     if acl:
         kwargs["ACL"] = acl
 
-    if dry_run:
+    if context.dry_run:
         log.info("Dry-run: would write to S3 (ACL %s): %s", acl, url)
         return
     s3_client.put_object(**kwargs)
     log.info("Wrote to S3 (ACL %s): %s", acl, url)
+
+    cf_distribution_id = options.get("cf-distribution-id")
+    if cf_distribution_id:
+        context.add_cloudfront_invalidation(cf_distribution_id, purl.path)
