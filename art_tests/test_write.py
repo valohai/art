@@ -1,13 +1,16 @@
+import unittest.mock
+
 import art.write
 from art.config import ArtConfig
 from art.context import ArtContext
 from art.manifest import Manifest
 
 
-def test_dest_options(mocker, tmpdir):
+def test_dest_options(monkeypatch, tmpdir):
     cfg = ArtConfig(work_dir=str(tmpdir), dests=[str(tmpdir)], name="", repo_url=str(tmpdir))
     mf = Manifest(files={})
-    wf = mocker.patch("art.write._write_file")
+    wf = unittest.mock.MagicMock()
+    monkeypatch.setattr(art.write, "_write_file", wf)
     context = ArtContext(dry_run=False)
     art.write.write(
         config=cfg,
