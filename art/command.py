@@ -127,6 +127,7 @@ def run_command(argv: Optional[List[str]] = None) -> None:
             process_config_postfork(context, args, forked_config)
         except Problem as p:
             ap.error(f"config {forked_config.name}: {p}")
+    context.execute_post_run_tasks()
 
 
 def clean_dest(dest: str) -> str:

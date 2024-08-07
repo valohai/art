@@ -38,3 +38,7 @@ def s3_write(
         return
     s3_client.put_object(**kwargs)
     log.info("Wrote to S3 (ACL %s): %s", acl, url)
+
+    cf_distribution_id = options.get("cf-distribution-id")
+    if cf_distribution_id:
+        context.add_cloudfront_invalidation(cf_distribution_id, purl.path)
